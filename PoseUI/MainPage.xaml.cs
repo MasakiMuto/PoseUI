@@ -15,11 +15,14 @@ using Windows.UI.Xaml.Navigation;
 
 namespace PoseUI
 {
-    public sealed partial class MainPage : Page
-    {
-        public MainPage()
-        {
-            this.InitializeComponent();
-        }
-    }
+	public sealed partial class MainPage : Page
+	{
+		Human Human;
+
+		public MainPage()
+		{
+			this.InitializeComponent();
+			Human = new Human();
+		}
+	}
 }
