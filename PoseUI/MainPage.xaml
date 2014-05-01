@@ -15,15 +15,18 @@
         </Style>
         <Style TargetType="Ellipse" BasedOn="{StaticResource ShapeBase}"/>
         <Style TargetType="Polygon" BasedOn="{StaticResource ShapeBase}" />
+        <Style TargetType="Polyline" BasedOn="{StaticResource ShapeBase}">
+            <Setter Property="Fill" Value="Transparent" />
+        </Style>
     </Page.Resources>
 
-    <Grid Background="CornflowerBlue">
-        <Ellipse HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100"/>
+    <Canvas x:Name="Canvas" Background="CornflowerBlue">
+        <!--<Ellipse HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100"/>
 
         <Polygon Points="-50, -30, 50, -30, 0, 100">
-            <!--<Polygon.RenderTransform>
+            --><!--<Polygon.RenderTransform>
                 <CompositeTransform TranslateX="100" TranslateY="100"/>
-            </Polygon.RenderTransform>-->
-        </Polygon>
-    </Grid>
+            </Polygon.RenderTransform>--><!--
+        </Polygon>-->
+    </Canvas>
 </Page>
