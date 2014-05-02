@@ -21,13 +21,15 @@ namespace PoseUI
 	{
 		Joint Target;
 		IDraggableNode Parent;
+		Human human;
 
 		readonly double Size = 10;
 		public Rectangle Shape { get; private set; }
 		Point currentPoint;
 
-		public ControlBox(Joint target, IDraggableNode parent)
+		public ControlBox(Joint target, IDraggableNode parent, Human human)
 		{
+			this.human = human;
 			Target = target;
 			Parent = parent;
 			Shape = new Rectangle()
@@ -44,7 +46,11 @@ namespace PoseUI
 				currentPoint = Target.Position;
 				Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Blue);
 			};
-			Shape.ManipulationCompleted += (s, e) => Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Red);
+			Shape.ManipulationCompleted += (s, e) =>
+			{
+				Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Red);
+				human.Push();
+			};
 			Update();
 		}
 

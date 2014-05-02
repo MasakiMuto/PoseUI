@@ -47,7 +47,7 @@ namespace PoseUI
 
 		void ClickUndo(object sender, RoutedEventArgs e)
 		{
-
+			Human.Undo();
 		}
 
 		void ClickRedo(object sender, RoutedEventArgs e)
@@ -57,7 +57,7 @@ namespace PoseUI
 
 		void ClickReset(object sender, RoutedEventArgs e)
 		{
-
+			Human.Reset();
 		}
 
 	
