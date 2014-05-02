@@ -44,5 +44,22 @@ namespace PoseUI
 			t.Rotation += e.Delta.Rotation;
 			
 		}
+
+		void ClickUndo(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		void ClickRedo(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		void ClickReset(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+	
 	}
 }

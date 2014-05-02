@@ -20,6 +20,11 @@
         </Style>
         <Style TargetType="Rectangle">
         </Style>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="Margin" Value="0, 0, 0, 30"/>
+        </Style>
     </Page.Resources>
 
     <Grid Background="CornflowerBlue">
@@ -27,14 +32,19 @@
             <Canvas.RenderTransform>
                 <CompositeTransform />
             </Canvas.RenderTransform>
-            <Ellipse HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100"/>
-
-            <Polygon Points="-50, -30, 50, -30, 0, 100">
-                <Polygon.RenderTransform>
-                    <CompositeTransform TranslateX="100" TranslateY="100"/>
-                </Polygon.RenderTransform>
-            </Polygon>
         </Canvas>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="0, 20, 20, 0">
+
+            <Button Click="ClickUndo">
+                元に戻す
+            </Button>
+            <Button Click="ClickRedo">
+                やり直し
+            </Button>
+            <Button Click="ClickReset">
+                最初から
+            </Button>
+        </StackPanel>
     </Grid>
 
 </Page>
