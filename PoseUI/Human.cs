@@ -109,6 +109,8 @@ namespace PoseUI
 
 			public void UpdateShape()
 			{
+				jointBox.Update();
+				headBox.Update();
 				Line.Points = new Windows.UI.Xaml.Media.PointCollection() { Root.GetAbsolutePosition(), Joint.GetAbsolutePosition(), Head.GetAbsolutePosition() };
 			}
 		}
@@ -146,7 +148,7 @@ namespace PoseUI
 				Parent.UpdateShape();
 			}
 
-			void Update()
+			public void Update()
 			{
 				Shape.SetValue(Canvas.LeftProperty, Target.GetAbsolutePosition().X - Size / 2);
 				Shape.SetValue(Canvas.TopProperty, Target.GetAbsolutePosition().Y - Size / 2);
