@@ -14,11 +14,7 @@ namespace PoseUI
 {
 	public class Human
 	{
-		interface IDraggableNode
-		{
-			IEnumerable<Shape> Shapes { get; }
-			void UpdateShape();
-		}
+		
 
 		class Body
 		{
@@ -66,6 +62,7 @@ namespace PoseUI
 			{
 				Ellipse.SetValue(Canvas.LeftProperty, Center.GetAbsolutePosition().X - Radius);
 				Ellipse.SetValue(Canvas.TopProperty, Center.GetAbsolutePosition().Y - Radius);
+				box.Update();
 			}
 		}
 
@@ -117,69 +114,15 @@ namespace PoseUI
 			}
 		}
 
-		class ControlBox
-		{
-			Joint Target;
-			IDraggableNode Parent;
-
-			readonly double Size = 10;
-			public Rectangle Shape { get; private set; }
-			Point currentPoint;
-
-			public ControlBox(Joint target, IDraggableNode parent)
-			{
-				Target = target;
-				Parent = parent;
-				Shape = new Rectangle()
-				{
-					Width = Size,
-					Height = Size
-				};
-				Shape.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.TranslateY | Windows.UI.Xaml.Input.ManipulationModes.TranslateX;
-				Shape.ManipulationDelta += shape_ManipulationDelta;
-				Shape.Fill = new SolidColorBrush(Colors.Red);
-				Shape.Stroke = new SolidColorBrush(Colors.Green);
-				Shape.ManipulationStarted += (s, e) =>
-				{
-					currentPoint = Target.Position;
-					Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Blue);
-				};
-				Shape.ManipulationCompleted += (s, e) => Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Red);
-				Update();
-			}
-
-			void shape_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
-			{
-				var t = (Shape.Parent as Canvas).RenderTransform as CompositeTransform;
-				var tr = new CompositeTransform()
-				{
-					ScaleX = t.ScaleX,
-					ScaleY = t.ScaleY,
-					Rotation = t.Rotation
-				};
-				currentPoint = currentPoint.Add(tr.Inverse.TransformPoint( e.Delta.Translation));
-				Target.Position = currentPoint;
-				//Target.Position = t.Inverse.TransformPoint(currentPoint);
-				
-				Update();
-				Parent.UpdateShape();
-				e.Handled = true;
-			}
-
-			public void Update()
-			{
-				Shape.SetValue(Canvas.LeftProperty, Target.GetAbsolutePosition().X - Size / 2);
-				Shape.SetValue(Canvas.TopProperty, Target.GetAbsolutePosition().Y - Size / 2);
-			}
-
-		}
-
+		
 		Body body;
 		Head head;
 		Arm leftArm, rightArm, leftLeg, rightLeg;
 		private Windows.UI.Xaml.Controls.Panel canvas;
 
 		Polygon bodyShape;
+
+		Arm[] arms;
 
 		public Human(Windows.UI.Xaml.Controls.Panel canvas)
 		{
@@ -191,6 +134,7 @@ namespace PoseUI
 			rightArm = leftArm.Mirror();
 			leftLeg = new Arm(body.Center, new Point(0, 0), Util.FromPolar(60, Math.PI * 0.6), Util.FromPolar(50, Math.PI * 0.5));
 			rightLeg = leftLeg.Mirror();
+			arms = new[]{leftArm, leftLeg, rightArm, rightLeg};
 
 			bodyShape = new Polygon()
 			{
@@ -199,11 +143,10 @@ namespace PoseUI
 			canvas.Children.Add(bodyShape);
 			AddShapes(head.Shapes);
 			head.UpdateShape();
-			AddShapes(leftArm.Shapes);
-			AddShapes(leftLeg.Shapes);
-			AddShapes(rightArm.Shapes);
-			AddShapes(rightLeg.Shapes);
-
+			foreach (var arm in arms)
+			{
+				AddShapes(arm.Shapes);
+			}
 		}
 
 		void AddShapes(IEnumerable<Shape> shapes)
@@ -213,7 +156,14 @@ namespace PoseUI
 				canvas.Children.Add(item);
 			}
 		}
-		
 
+		void Update()
+		{
+			head.UpdateShape();
+			foreach (var item in arms)
+			{
+				item.UpdateShape();
+			}
+		}
 	}
 }
