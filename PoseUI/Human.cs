@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
 
 namespace PoseUI
@@ -86,6 +89,7 @@ namespace PoseUI
 		private Windows.UI.Xaml.Controls.Panel canvas;
 
 		Polygon bodyShape;
+		Rectangle box;
 
 		public Human(Windows.UI.Xaml.Controls.Panel canvas)
 		{
@@ -109,11 +113,43 @@ namespace PoseUI
 			canvas.Children.Add(rightArm.Line);
 			canvas.Children.Add(leftLeg.Line);
 			canvas.Children.Add(rightLeg.Line);
+
+			box = new Rectangle()
+			{
+				Width = 10,
+				Height = 10,
+			};
+			canvas.Children.Add(box);
+			box.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.TranslateX | Windows.UI.Xaml.Input.ManipulationModes.TranslateY;
+			box.ManipulationDelta += box_ManipulationDelta;
+			box.ManipulationStarted += box_ManipulationStarted;
+			box.ManipulationCompleted += box_ManipulationCompleted;
+			UpdateBox();
 		}
 
-		public void Draw()
+		void box_ManipulationCompleted(object sender, Windows.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs e)
 		{
+			box.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Red);
+		
+		}
 
+		void box_ManipulationStarted(object sender, Windows.UI.Xaml.Input.ManipulationStartedRoutedEventArgs e)
+		{
+			box.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Blue);
+		
+		}
+
+		void box_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
+		{
+			head.Center.Position = head.Center.Position.Add(e.Delta.Translation);
+			UpdateBox();
+			head.Update();
+		}
+
+		void UpdateBox()
+		{
+			box.SetValue(Canvas.LeftProperty, head.Center.GetAbsolutePosition().X);
+			box.SetValue(Canvas.TopProperty, head.Center.GetAbsolutePosition().Y);
 		}
 
 	}

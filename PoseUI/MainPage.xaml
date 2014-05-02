@@ -18,6 +18,10 @@
         <Style TargetType="Polyline" BasedOn="{StaticResource ShapeBase}">
             <Setter Property="Fill" Value="Transparent" />
         </Style>
+        <Style TargetType="Rectangle">
+            <Setter Property="Fill" Value="Red" />
+            <Setter Property="Stroke" Value="Green" />
+        </Style>
     </Page.Resources>
 
     <Canvas x:Name="canvas" Background="CornflowerBlue">
