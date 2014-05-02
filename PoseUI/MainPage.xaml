@@ -22,13 +22,19 @@
         </Style>
     </Page.Resources>
 
-    <Canvas x:Name="canvas" Background="CornflowerBlue">
-        <Ellipse HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100"/>
+    <Grid Background="CornflowerBlue">
+        <Canvas x:Name="canvas" Background="Red" Width="0" Height="0" RenderTransformOrigin="0.5,0.5" ManipulationMode="Rotate" ManipulationDelta="canvas_ManipulationDelta">
+            <Canvas.RenderTransform>
+                <CompositeTransform />
+            </Canvas.RenderTransform>
+            <Ellipse HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100"/>
 
-        <Polygon Points="-50, -30, 50, -30, 0, 100">
-            <Polygon.RenderTransform>
-                <CompositeTransform TranslateX="100" TranslateY="100"/>
-            </Polygon.RenderTransform>
-        </Polygon>
-    </Canvas>
+            <Polygon Points="-50, -30, 50, -30, 0, 100">
+                <Polygon.RenderTransform>
+                    <CompositeTransform TranslateX="100" TranslateY="100"/>
+                </Polygon.RenderTransform>
+            </Polygon>
+        </Canvas>
+    </Grid>
+
 </Page>

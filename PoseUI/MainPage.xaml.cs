@@ -23,6 +23,26 @@ namespace PoseUI
 		{
 			this.InitializeComponent();
 			Human = new Human(canvas);
+			SetTransform();
+		}
+
+		void SetTransform()
+		{
+			var t = canvas.RenderTransform as CompositeTransform;
+			var h = Window.Current.Bounds.Height;
+			var w = Window.Current.Bounds.Width;
+			double originalWidth = 300;
+			double originalHeight = 300;
+			var scale = Math.Min(h / originalHeight, w / originalWidth);
+			t.ScaleY = scale;
+			t.ScaleX = scale;
+		}
+
+		private void canvas_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
+		{
+			var t = canvas.RenderTransform as CompositeTransform;
+			t.Rotation += e.Delta.Rotation;
+			
 		}
 	}
 }

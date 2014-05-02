@@ -27,7 +27,7 @@ namespace PoseUI
 
 			public Body()
 			{
-				Center = new Joint(new Point(250, 250));
+				Center = new Joint(new Point(0, 0));
 			}
 
 		}
@@ -150,12 +150,20 @@ namespace PoseUI
 
 			void shape_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
 			{
-				//Target.Position = e.Position.Minus(e.Delta.Translation);
-				currentPoint = currentPoint.Add(e.Delta.Translation);
-				//Target.Position = Target.Position.Add(e.Delta.Translation);
+				var t = (Shape.Parent as Canvas).RenderTransform as CompositeTransform;
+				var tr = new CompositeTransform()
+				{
+					ScaleX = t.ScaleX,
+					ScaleY = t.ScaleY,
+					Rotation = t.Rotation
+				};
+				currentPoint = currentPoint.Add(tr.Inverse.TransformPoint( e.Delta.Translation));
 				Target.Position = currentPoint;
+				//Target.Position = t.Inverse.TransformPoint(currentPoint);
+				
 				Update();
 				Parent.UpdateShape();
+				e.Handled = true;
 			}
 
 			public void Update()
