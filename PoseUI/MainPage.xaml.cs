@@ -22,7 +22,7 @@ namespace PoseUI
 		public MainPage()
 		{
 			this.InitializeComponent();
-			Human = new Human(Canvas);
+			Human = new Human(canvas);
 		}
 	}
 }

@@ -18,5 +18,10 @@ namespace PoseUI
 		{
 			return new Point(-p.X, p.Y);
 		}
+
+		public static Point FromPolar(double length, double angle)
+		{
+			return new Point(length * Math.Cos(angle), length * Math.Sin(angle));
+		}
 	}
 }

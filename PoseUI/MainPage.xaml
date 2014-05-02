@@ -20,13 +20,13 @@
         </Style>
     </Page.Resources>
 
-    <Canvas x:Name="Canvas" Background="CornflowerBlue">
-        <!--<Ellipse HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100"/>
+    <Canvas x:Name="canvas" Background="CornflowerBlue">
+        <Ellipse HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100"/>
 
         <Polygon Points="-50, -30, 50, -30, 0, 100">
-            --><!--<Polygon.RenderTransform>
+            <Polygon.RenderTransform>
                 <CompositeTransform TranslateX="100" TranslateY="100"/>
-            </Polygon.RenderTransform>--><!--
-        </Polygon>-->
+            </Polygon.RenderTransform>
+        </Polygon>
     </Canvas>
 </Page>

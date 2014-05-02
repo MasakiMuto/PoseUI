@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Shapes;
 
 namespace PoseUI
@@ -24,18 +25,34 @@ namespace PoseUI
 
 		class Head
 		{
+			readonly double Radius = 15;
 			public Joint Center;
+
+			public Ellipse Ellipse { get; private set; }
 
 			public Head(Joint parent, Point p)
 			{
 				Center = new Joint(p);
 				parent.AddChild(Center);
+				Ellipse = new Ellipse()
+				{
+					Width = Radius * 2, 
+					Height = Radius * 2
+				};
+			}
+
+			public void Update()
+			{
+				Ellipse.SetValue(Canvas.LeftProperty, Center.GetAbsolutePosition().X - Radius);
+				Ellipse.SetValue(Canvas.TopProperty, Center.GetAbsolutePosition().Y - Radius);
 			}
 		}
 
 		class Arm
 		{
 			public Joint Root, Joint, Head;
+
+			public Polyline Line { get; private set; }
 
 			public Arm(Joint parent, Point root, Point joint, Point head)
 			{
@@ -45,6 +62,8 @@ namespace PoseUI
 				Root.AddChild(Joint);
 				Joint.AddChild(Head);
 				parent.AddChild(Root);
+				Line = new Polyline();
+				Update();
 			}
 
 			public Arm Mirror()
@@ -53,81 +72,43 @@ namespace PoseUI
 				return m;
 			}
 
-			public Polyline GetLine()
+			public void Update()
 			{
-				return new Polyline()
-				{
-					Points = new Windows.UI.Xaml.Media.PointCollection() {Root.GetAbsolutePosition(), Joint.GetAbsolutePosition(), Head.GetAbsolutePosition() }
-				};
+				Line.Points = new Windows.UI.Xaml.Media.PointCollection() { Root.GetAbsolutePosition(), Joint.GetAbsolutePosition(), Head.GetAbsolutePosition() };
 			}
 		}
 
-		class Joint
-		{
-			public Point Position;
-			public Joint Parent { get; private set; }
-			List<Joint> Children;
-
-			public Joint()
-			{
-				Children = new List<Joint>();
-			}
-
-			public Joint(Point p)
-				: this()
-			{
-				Position = p;
-			}
-
-			public Point GetAbsolutePosition()
-			{
-				if (Parent == null)
-				{
-					return Position;
-				}
-				else
-				{
-					return Parent.GetAbsolutePosition().Add(Position);
-				}
-			}
-
-			public void AddChild(Joint child)
-			{
-				child.Parent = this;
-				Children.Add(child);
-			}
-
-			
-
-		}
+		
 
 		Body body;
 		Head head;
 		Arm leftArm, rightArm, leftLeg, rightLeg;
-		private Windows.UI.Xaml.Controls.Panel Canvas;
+		private Windows.UI.Xaml.Controls.Panel canvas;
 
-		const int HeadRadius = 50;
+		Polygon bodyShape;
 
-		public Human(Windows.UI.Xaml.Controls.Panel Canvas)
+		public Human(Windows.UI.Xaml.Controls.Panel canvas)
 		{
-			this.Canvas = Canvas;
+			this.canvas = canvas;
 
 			body = new Body();
-			head = new Head(body.Center, new Point(0, -75));
-			leftArm = new Arm(body.Center, new Point(-50, -50), new Point(-50, 20), new Point(-50, 0));
+			head = new Head(body.Center, new Point(0, -90));
+			leftArm = new Arm(body.Center, new Point(-30, -80), Util.FromPolar(50, Math.PI * 0.7), Util.FromPolar(50, Math.PI));
 			rightArm = leftArm.Mirror();
-			leftLeg = new Arm(body.Center, new Point(0, 100), new Point(-30, 50), new Point(0, 50));
+			leftLeg = new Arm(body.Center, new Point(0, 0), Util.FromPolar(60, Math.PI * 0.6), Util.FromPolar(50, Math.PI * 0.5));
 			rightLeg = leftLeg.Mirror();
 
-			Canvas.Children.Add(new Polygon()
+			bodyShape = new Polygon()
 			{
-				Points = new Windows.UI.Xaml.Media.PointCollection() { leftArm.Root.GetAbsolutePosition(), rightArm.Root.GetAbsolutePosition(), leftLeg.Root.GetAbsolutePosition()}
-			});
-			Canvas.Children.Add(new Ellipse() { Width = HeadRadius, Height = HeadRadius, Margin = new Windows.UI.Xaml.Thickness(head.Center.GetAbsolutePosition().X - HeadRadius / 2, head.Center.GetAbsolutePosition().Y - HeadRadius / 2, 0, 0) });
-			Canvas.Children.Add(leftArm.GetLine());
-			Canvas.Children.Add(rightArm.GetLine());
-			Canvas.Children.Add(leftLeg.GetLine());
-			Canvas.Children.Add(rightLeg.GetLine());
+				Points = new Windows.UI.Xaml.Media.PointCollection() { leftArm.Root.GetAbsolutePosition(), rightArm.Root.GetAbsolutePosition(), leftLeg.Root.GetAbsolutePosition() }
+			};
+			canvas.Children.Add(bodyShape);
+			canvas.Children.Add(head.Ellipse);
+			head.Update();
+			canvas.Children.Add(leftArm.Line);
+			canvas.Children.Add(rightArm.Line);
+			canvas.Children.Add(leftLeg.Line);
+			canvas.Children.Add(rightLeg.Line);
 		}
 
 		public void Draw()
