@@ -9,14 +9,32 @@ namespace PoseUI
 {
 	public class Joint
 	{
-		public Point Position;
+		Point position;
+		public Point Position 
+		{
+			get { return position; }
+			set 
+			{
+				if (!ConstrainLength)
+				{
+					position = value;
+				}
+				else
+				{
+					var a = Math.Atan2(value.Y, value.X);
+					position = Util.FromPolar(Length, a);
+				}
+			}
+		}
 		public Joint Parent { get; private set; }
 		List<Joint> Children;
 		double Length;
+		public bool ConstrainLength { get; set; }
 
 		public Joint()
 		{
 			Children = new List<Joint>();
+			ConstrainLength = false;
 		}
 
 		public Joint(Point p)

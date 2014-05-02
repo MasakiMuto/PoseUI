@@ -27,7 +27,7 @@ namespace PoseUI
 
 			public Body()
 			{
-				Center = new Joint(new Point(600, 600));
+				Center = new Joint(new Point(250, 250));
 			}
 
 		}
@@ -89,6 +89,8 @@ namespace PoseUI
 				jointBox = new ControlBox(Joint, this);
 				headBox = new ControlBox(Head, this);
 				UpdateShape();
+				Joint.ConstrainLength = true;
+				Head.ConstrainLength = true;
 			}
 
 			public Arm Mirror()
@@ -122,6 +124,7 @@ namespace PoseUI
 
 			readonly double Size = 10;
 			public Rectangle Shape { get; private set; }
+			Point currentPoint;
 
 			public ControlBox(Joint target, IDraggableNode parent)
 			{
@@ -136,14 +139,21 @@ namespace PoseUI
 				Shape.ManipulationDelta += shape_ManipulationDelta;
 				Shape.Fill = new SolidColorBrush(Colors.Red);
 				Shape.Stroke = new SolidColorBrush(Colors.Green);
-				Shape.ManipulationStarted += (s, e) => Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Blue);
+				Shape.ManipulationStarted += (s, e) =>
+				{
+					currentPoint = Target.Position;
+					Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Blue);
+				};
 				Shape.ManipulationCompleted += (s, e) => Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Red);
 				Update();
 			}
 
 			void shape_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
 			{
-				Target.Position = Target.Position.Add(e.Delta.Translation);
+				//Target.Position = e.Position.Minus(e.Delta.Translation);
+				currentPoint = currentPoint.Add(e.Delta.Translation);
+				//Target.Position = Target.Position.Add(e.Delta.Translation);
+				Target.Position = currentPoint;
 				Update();
 				Parent.UpdateShape();
 			}
