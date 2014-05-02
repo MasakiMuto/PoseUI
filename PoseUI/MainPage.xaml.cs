@@ -52,7 +52,7 @@ namespace PoseUI
 
 		void ClickRedo(object sender, RoutedEventArgs e)
 		{
-
+			Human.Redo();
 		}
 
 		void ClickReset(object sender, RoutedEventArgs e)

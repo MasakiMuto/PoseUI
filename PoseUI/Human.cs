@@ -171,6 +171,10 @@ namespace PoseUI
 
 			void Push(State s)
 			{
+				if (index != states.Count - 1)//履歴先頭でない
+				{
+					states.RemoveRange(index + 1, states.Count - index - 1);
+				}
 				states.Add(s);
 				index++;
 			}
@@ -187,7 +191,12 @@ namespace PoseUI
 
 			public void Redo()
 			{
-
+				if (states.Count < index + 2)
+				{
+					return;
+				}
+				index++;
+				Pop(states[index]);
 			}
 
 			void Pop(State s)
@@ -274,7 +283,7 @@ namespace PoseUI
 
 		public void Redo()
 		{
-
+			State.Redo();
 		}
 
 		public void Reset()
