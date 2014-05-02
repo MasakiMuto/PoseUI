@@ -14,6 +14,12 @@ namespace PoseUI
 {
 	public class Human
 	{
+		interface IDraggableNode
+		{
+			IEnumerable<Shape> Shapes { get; }
+			void UpdateShape();
+		}
+
 		class Body
 		{
 			public float Rotation;
@@ -26,12 +32,14 @@ namespace PoseUI
 
 		}
 
-		class Head
+		class Head : IDraggableNode
 		{
 			readonly double Radius = 15;
 			public Joint Center;
 
-			public Ellipse Ellipse { get; private set; }
+			Ellipse Ellipse { get; set; }
+			ControlBox box;
+			
 
 			public Head(Joint parent, Point p)
 			{
@@ -42,20 +50,32 @@ namespace PoseUI
 					Width = Radius * 2, 
 					Height = Radius * 2
 				};
+				box = new ControlBox(Center, this);
 			}
 
-			public void Update()
+			public IEnumerable<Shape> Shapes
+			{
+				get
+				{
+					yield return Ellipse;
+					yield return box.Shape;
+				}
+			}
+
+			public void UpdateShape()
 			{
 				Ellipse.SetValue(Canvas.LeftProperty, Center.GetAbsolutePosition().X - Radius);
 				Ellipse.SetValue(Canvas.TopProperty, Center.GetAbsolutePosition().Y - Radius);
 			}
 		}
 
-		class Arm
+		class Arm : IDraggableNode
 		{
 			public Joint Root, Joint, Head;
 
-			public Polyline Line { get; private set; }
+			Polyline Line { get; set; }
+
+			ControlBox jointBox, headBox;
 
 			public Arm(Joint parent, Point root, Point joint, Point head)
 			{
@@ -66,7 +86,9 @@ namespace PoseUI
 				Joint.AddChild(Head);
 				parent.AddChild(Root);
 				Line = new Polyline();
-				Update();
+				jointBox = new ControlBox(Joint, this);
+				headBox = new ControlBox(Head, this);
+				UpdateShape();
 			}
 
 			public Arm Mirror()
@@ -75,13 +97,62 @@ namespace PoseUI
 				return m;
 			}
 
-			public void Update()
+			public IEnumerable<Shape> Shapes
+			{
+				get 
+				{
+					yield return Line;
+					yield return jointBox.Shape;
+					yield return headBox.Shape;
+				}
+			}
+
+			public void UpdateShape()
 			{
 				Line.Points = new Windows.UI.Xaml.Media.PointCollection() { Root.GetAbsolutePosition(), Joint.GetAbsolutePosition(), Head.GetAbsolutePosition() };
 			}
 		}
 
-		
+		class ControlBox
+		{
+			Joint Target;
+			IDraggableNode Parent;
+
+			readonly double Size = 10;
+			public Rectangle Shape { get; private set; }
+
+			public ControlBox(Joint target, IDraggableNode parent)
+			{
+				Target = target;
+				Parent = parent;
+				Shape = new Rectangle()
+				{
+					Width = Size,
+					Height = Size
+				};
+				Shape.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.TranslateY | Windows.UI.Xaml.Input.ManipulationModes.TranslateX;
+				Shape.ManipulationDelta += shape_ManipulationDelta;
+				Shape.Fill = new SolidColorBrush(Colors.Red);
+				Shape.Stroke = new SolidColorBrush(Colors.Green);
+				Shape.ManipulationStarted += (s, e) => Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Blue);
+				Shape.ManipulationCompleted += (s, e) => Shape.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Red);
+				Update();
+			}
+
+			void shape_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
+			{
+				Target.Position = Target.Position.Add(e.Delta.Translation);
+				Update();
+				Parent.UpdateShape();
+			}
+
+			void Update()
+			{
+				Shape.SetValue(Canvas.LeftProperty, Target.GetAbsolutePosition().X - Size / 2);
+				Shape.SetValue(Canvas.TopProperty, Target.GetAbsolutePosition().Y - Size / 2);
+			}
+
+		}
 
 		Body body;
 		Head head;
@@ -89,7 +160,6 @@ namespace PoseUI
 		private Windows.UI.Xaml.Controls.Panel canvas;
 
 		Polygon bodyShape;
-		Rectangle box;
 
 		public Human(Windows.UI.Xaml.Controls.Panel canvas)
 		{
@@ -107,50 +177,23 @@ namespace PoseUI
 				Points = new Windows.UI.Xaml.Media.PointCollection() { leftArm.Root.GetAbsolutePosition(), rightArm.Root.GetAbsolutePosition(), leftLeg.Root.GetAbsolutePosition() }
 			};
 			canvas.Children.Add(bodyShape);
-			canvas.Children.Add(head.Ellipse);
-			head.Update();
-			canvas.Children.Add(leftArm.Line);
-			canvas.Children.Add(rightArm.Line);
-			canvas.Children.Add(leftLeg.Line);
-			canvas.Children.Add(rightLeg.Line);
+			AddShapes(head.Shapes);
+			head.UpdateShape();
+			AddShapes(leftArm.Shapes);
+			AddShapes(leftLeg.Shapes);
+			AddShapes(rightArm.Shapes);
+			AddShapes(rightLeg.Shapes);
 
-			box = new Rectangle()
+		}
+
+		void AddShapes(IEnumerable<Shape> shapes)
+		{
+			foreach (var item in shapes)
 			{
-				Width = 10,
-				Height = 10,
-			};
-			canvas.Children.Add(box);
-			box.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.TranslateX | Windows.UI.Xaml.Input.ManipulationModes.TranslateY;
-			box.ManipulationDelta += box_ManipulationDelta;
-			box.ManipulationStarted += box_ManipulationStarted;
-			box.ManipulationCompleted += box_ManipulationCompleted;
-			UpdateBox();
+				canvas.Children.Add(item);
+			}
 		}
-
-		void box_ManipulationCompleted(object sender, Windows.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs e)
-		{
-			box.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Red);
 		
-		}
-
-		void box_ManipulationStarted(object sender, Windows.UI.Xaml.Input.ManipulationStartedRoutedEventArgs e)
-		{
-			box.Fill.SetValue(SolidColorBrush.ColorProperty, Colors.Blue);
-		
-		}
-
-		void box_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
-		{
-			head.Center.Position = head.Center.Position.Add(e.Delta.Translation);
-			UpdateBox();
-			head.Update();
-		}
-
-		void UpdateBox()
-		{
-			box.SetValue(Canvas.LeftProperty, head.Center.GetAbsolutePosition().X);
-			box.SetValue(Canvas.TopProperty, head.Center.GetAbsolutePosition().Y);
-		}
 
 	}
 }
