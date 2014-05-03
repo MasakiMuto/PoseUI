@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -24,6 +25,8 @@ namespace PoseUI
 			this.InitializeComponent();
 			Human = new Human(canvas);
 			SetTransform();
+			canvas.ManipulationStarted += (s, e) => (Resources["rotateBrush"] as SolidColorBrush).Color = (Resources["activeRotateColor"] as SolidColorBrush).Color;
+			canvas.ManipulationCompleted += (s, e) => (Resources["rotateBrush"] as SolidColorBrush).Color = (Resources["rotateColor"] as SolidColorBrush).Color;
 		}
 
 		void SetTransform()
