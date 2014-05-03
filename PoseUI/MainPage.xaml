@@ -20,6 +20,11 @@
         </Style>
         <Style TargetType="Rectangle">
         </Style>
+        <Style TargetType="Path">
+            <Setter Property="Stroke" Value="White" />
+            <Setter Property="StrokeThickness" Value="2" />
+            
+        </Style>
         <Style TargetType="Button">
             <Setter Property="Width" Value="100" />
             <Setter Property="Height" Value="50" />
@@ -45,6 +50,14 @@
                 最初から
             </Button>
         </StackPanel>
+        <Canvas x:Name="rotate" Height="512" UseLayoutRounding="False" Width="512">
+        		<Path Data="M199.429,200.429C199.429,90.198,110.232,1,0,1" Height="200.429" Canvas.Left="217.964" Stretch="None" Canvas.Top="-1" Width="200.429"/>
+        		<Path Data="M0.707,26.779L26.778,0.708" Height="27.485" Canvas.Left="416.686" Stretch="None" Canvas.Top="172.65" Width="27.485"/>
+        		<Path Data="M28.528,28.529L0.707,0.707" Height="29.236" Canvas.Left="388.865" Stretch="None" Canvas.Top="170.9" Width="29.235"/>
+        		<Path Data="M200.428,199.429C90.198,199.429,1,110.232,1,0" Height="200.429" Canvas.Left="-1" Stretch="None" Canvas.Top="198.964" Width="200.428"/>
+        		<Path Data="M26.777,0.707L0.707,26.778" Height="27.485" Canvas.Left="172.651" Stretch="None" Canvas.Top="397.686" Width="27.484"/>
+        		<Path Data="M28.528,28.528L0.707,0.707" Height="29.235" Canvas.Left="170.9" Stretch="None" Canvas.Top="369.865" Width="29.235"/>
+        </Canvas>
     </Grid>
 
 </Page>
